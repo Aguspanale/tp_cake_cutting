@@ -1,0 +1,81 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\title{\textbf{Simulación Proporcional de Reparto de Torta\\
+Método del Último Reductor}}
+\author{Trabajo Práctico – Moroni Giancarlo, Pañale Agustín}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Objetivo}
+Evaluar mediante simulación la garantía proporcional
+(\(\forall p:\ U_p \ge \tfrac13\)) en un reparto de una torta
+unidimensional de \(T\) pedazos entre tres jugadores,
+utilizando el protocolo \emph{Last–Diminisher} con cuota fija \(1/3\).
+
+\section{Descripción del algoritmo}
+Se implementó en Python la clase \texttt{CakeDivisionSimulator}
+con los siguientes métodos clave:
+\begin{itemize}
+  \item \textbf{generate\_cake(T)}: arreglo aleatorio de long.\(T\)
+        con componentes \texttt{'A'} o \texttt{'B'}.
+  \item \textbf{generate\_random\_preferences()}: valores
+        \(v_{p,A},v_{p,B}\sim U(0.1,2.0)\) para cada jugador \(p\).
+  \item \textbf{normalize\_utilities(cake,prefs)}: escala de modo
+        que la suma de valores del cake entero sea \(1\).
+  \item \textbf{last\_diminisher\_algorithm(cake,prefs)}:
+        \begin{enumerate}
+          \item Cada ronda sigue: el primer jugador propone un
+                corte donde su valor acumulado alcance \(\tfrac13\);
+          \item los demás pueden “reducir” si valoran ese trozo
+                por encima de \(\tfrac13\);
+          \item el último que reduce se lleva el trozo;
+          \item se repite con el resto hasta asignar a todos.
+        \end{enumerate}
+  \item \textbf{run\_simulation(T,N)}: repite \(N\) veces
+        el reparto para tortas de tamaño \(T\), guarda utilidades
+        y desviaciones medias \(\frac{1}{3}\sum|U_p-\tfrac13|\).
+\end{itemize}
+
+\section{Resultados}
+Se ejecutó la simulación con \(T=300\), \(N=50\).  
+La Figura~\ref{fig:resultados} muestra:
+\begin{itemize}
+  \item \emph{Utilities per Iteration}: cada jugador oscila
+        muy cerca de \(1/3\), sin caer por debajo.
+  \item \emph{Utility Distribution}: histograma concentrado
+        a la derecha de la línea \(1/3\).
+  \item \emph{Deviation per Iteration}: desviaciones típicas
+        en torno a \(0.003\)–\(0.006\).
+  \item \emph{Boxplot Utilities}: cajas centradas en \(\ge0.333\)
+        con colas superiores moderadas.
+\end{itemize}
+
+\begin{figure}[ht]
+  \centering
+  \includegraphics[width=\textwidth]{cakecutting.png}
+  \caption{Simulación con método Last–Diminisher fijo (\(T=300,N=50\)).}
+  \label{fig:resultados}
+\end{figure}
+
+\section{Conclusiones}
+\begin{itemize}
+  \item El protocolo garantiza proporcionalidad: ningún jugador
+        recibe menos de \(\tfrac13\) salvo error discretizado \(1/T\).
+  \item Las utilidades mínimas observadas rondan \(0.332\), dentro
+        del margen \(\pm1/300\approx0.0033\).
+  \item La variabilidad residual se debe a la granularidad discreta.
+  \item Para reducir aún más la dispersión, aumentar \(T\) o usar
+        algoritmos de equidad más fuertes (p.ej.\ Selfridge–Conway).
+\end{itemize}
+
+\end{document}
